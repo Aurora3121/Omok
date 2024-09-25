@@ -48,7 +48,15 @@ OmokWnd::OmokWnd(
 	{
 		IS_CRASH("CreateWindow Error");
 	}
-	::memset(_boards, 0, sizeof(_boards));
+	
+	for (int y = 0; y < BOARDSIZE; y++)
+	{
+		for (int x = 0; x < BOARDSIZE; x++) 
+		{
+			_boards[y][x] = nullptr;
+		}
+	}
+
 	_brushs.resize(BRUSH_COLOR_COUNT);
 	_brushs[BRUSH_WOOD] = CreateSolidBrush(RGB(220, 179, 92));
 	_brushs[BRUSH_WHITE] = CreateSolidBrush(RGB(255, 255, 255));
@@ -222,17 +230,15 @@ void OmokWnd::HandleMouseClick(int xPos, int yPos)
 	_xPos = xIndex;
 	_yPos = yIndex;
 
-	if (_boards[_yPos][_xPos]) 
+	if (_boards[_yPos][_xPos] == nullptr)
 		return;
-
-	_boards[_yPos][_xPos] = true;
 
 	Vector2Int pos(_xPos, _yPos);
 	Stone* newStone = new Stone(static_cast<Stone::Color>(_nowTurn),pos);
 	_stones.push_back(newStone);
+	_boards[_yPos][_xPos] = newStone;
 
 	_nowTurn = static_cast<OmokWnd::TURN>((static_cast<int>(_nowTurn) + 1) % 2);
-
 	InvalidateRect(_hwnd, NULL, TRUE);
 }
 
@@ -303,11 +309,51 @@ void OmokWnd::DrawCircle(HDC hdc, int centerX, int centerY, int radius)
 	Ellipse(hdc, centerX - radius, centerY - radius, centerX + radius, centerY + radius);
 }
 
-OmokWnd::OmokResult OmokWnd::VictoryDecision(OmokWnd::TURN turn)
+OmokWnd::OmokResult OmokWnd::VictoryDecision(Stone* stone)
 {
 	OmokWnd::OmokResult result = OmokWnd::OmokResult::IDONTKNOW;
-	
+	Vector2Int dirVector[4] =
+	{
+		{-1, 0},		// 왼쪽
+		{-1,-1},		// 왼쪽 대각선
+		{0, -1},		// 위쪽
+		{1, -1}			// 오른쪽 대각선
+	};
 
+	Stone::Color color = stone->GetColor();
+	Vector2Int pos = stone->GetPos();
+	for (auto& dir : dirVector) 
+	{
+		Vector2Int nowPos = pos;
+		std::vector<Vector2Int> tasks;
+		tasks.push_back(dir);
+		tasks.push_back(dir * -1);
+
+		int cnt = 1;
+
+		for (const auto& task : tasks) 
+		{
+			while (true)
+			{
+				Vector2Int nextPos = { nowPos.x + task.x, nowPos.y + task.y };
+
+				if (nextPos.x < 0 || nextPos.y < 0 || nextPos.x >= BOARDSIZE - 1 || nextPos.y >= BOARDSIZE - 1)
+					break;
+
+				if (_boards[nextPos.y][nextPos.x] == nullptr)
+					break;
+
+				if (_boards[nextPos.y][nextPos.x]->GetColor() != color)
+					break;
+
+				// 여기까지 왔다는건 ... 같은색상의 돌이 한개가 더 있다는 뜻이니깐, 
+				cnt++;
+				nowPos = nextPos;
+			}
+		}
+	}
+
+	// 역행렬 구하기 ... 
 	return result;
 }
 

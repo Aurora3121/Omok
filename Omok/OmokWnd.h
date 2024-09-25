@@ -32,7 +32,7 @@ private:
 	int						_xPos = 0;
 	int						_yPos = 0;
 	std::vector<Stone*>		_stones;
-	bool					_boards[BOARDSIZE][BOARDSIZE];
+	Stone*					_boards[BOARDSIZE][BOARDSIZE];
 	OmokWnd::TURN			_nowTurn;
 	std::vector<HBRUSH>		_brushs;
 
@@ -56,7 +56,7 @@ public:
 	void HandleMouseClick(int xPos, int yPos);
 	void Render(HDC hdc);
 	void DrawCircle(HDC hdc, int centerX, int centerY, int radius);
-	OmokWnd::OmokResult VictoryDecision(OmokWnd::TURN turn);
+	OmokWnd::OmokResult VictoryDecision(Stone* stone);
 	bool ThreeThreeDecision();
 };
 
