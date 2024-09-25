@@ -5,5 +5,6 @@
 #include <tchar.h>
 #include <iostream>
 #include <vector>
+#include <queue>
 #include "macro.h"
 #include "Types.h"

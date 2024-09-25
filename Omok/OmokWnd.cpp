@@ -263,22 +263,20 @@ void OmokWnd::Render(HDC hdc)
 	const int flowerShopMargin = 3;
 	Vector2Int flowerShops[9] = 
 	{ 
-		{0 + flowerShopMargin,0 + flowerShopMargin}, 
-		{boardSize - 1 - flowerShopMargin, 0 + flowerShopMargin},
-		{0 + flowerShopMargin, boardSize - 1 - flowerShopMargin}, 
-		{boardSize - 1 - flowerShopMargin,boardSize - 1 - flowerShopMargin}, 
-		{boardSize - 1 - flowerShopMargin,boardSize / 2},
-		{boardSize / 2,boardSize - 1 - flowerShopMargin},
-		{0 + flowerShopMargin,boardSize / 2},
-		{boardSize / 2, 0 + flowerShopMargin},
-		{boardSize / 2, boardSize / 2}
+		{0 + flowerShopMargin				, 0 + flowerShopMargin}, 
+		{boardSize - 1 - flowerShopMargin	, 0 + flowerShopMargin},
+		{0 + flowerShopMargin				,  boardSize - 1 - flowerShopMargin}, 
+		{boardSize - 1 - flowerShopMargin	,  boardSize - 1 - flowerShopMargin}, 
+		{boardSize - 1 - flowerShopMargin	,  boardSize / 2},
+		{boardSize / 2						,  boardSize - 1 - flowerShopMargin},
+		{0 + flowerShopMargin			    ,  boardSize / 2},
+		{boardSize / 2					    ,  0 + flowerShopMargin},
+		{boardSize / 2						,  boardSize / 2}
 	};
-	
 	for (const auto& flowerShop : flowerShops) 
 	{
 		DrawCircle(hdc, (flowerShop.x * cellSize) + MARGIN, (flowerShop.y * cellSize) + MARGIN, R/2);
 	}
-
 	SelectObject(hdc, _brushs[WHITE_BRUSH]);
 
 	// 돌 그리기
@@ -303,4 +301,17 @@ void OmokWnd::Render(HDC hdc)
 void OmokWnd::DrawCircle(HDC hdc, int centerX, int centerY, int radius)
 {
 	Ellipse(hdc, centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+}
+
+OmokWnd::OmokResult OmokWnd::VictoryDecision(OmokWnd::TURN turn)
+{
+	OmokWnd::OmokResult result = OmokWnd::OmokResult::IDONTKNOW;
+	
+
+	return result;
+}
+
+bool OmokWnd::ThreeThreeDecision()
+{
+	return false;
 }

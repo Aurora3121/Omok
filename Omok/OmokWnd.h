@@ -8,6 +8,13 @@ class OmokWnd
 		WHITE = 1
 	};
 
+	enum OmokResult 
+	{
+		BLACK_WIN = 0,
+		WHILTE_WIND = 1,
+		IDONTKNOW = 2
+	};
+
 	enum Color 
 	{
 		BRUSH_WOOD,
@@ -49,5 +56,7 @@ public:
 	void HandleMouseClick(int xPos, int yPos);
 	void Render(HDC hdc);
 	void DrawCircle(HDC hdc, int centerX, int centerY, int radius);
+	OmokWnd::OmokResult VictoryDecision(OmokWnd::TURN turn);
+	bool ThreeThreeDecision();
 };
 
