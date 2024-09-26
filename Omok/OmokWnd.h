@@ -11,7 +11,7 @@ class OmokWnd
 	enum OmokResult 
 	{
 		BLACK_WIN = 0,
-		WHILTE_WIND = 1,
+		WHILTE_WIN = 1,
 		IDONTKNOW = 2
 	};
 

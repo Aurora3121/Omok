@@ -230,13 +230,31 @@ void OmokWnd::HandleMouseClick(int xPos, int yPos)
 	_xPos = xIndex;
 	_yPos = yIndex;
 
-	if (_boards[_yPos][_xPos] == nullptr)
+	if (_boards[_yPos][_xPos])
 		return;
 
 	Vector2Int pos(_xPos, _yPos);
 	Stone* newStone = new Stone(static_cast<Stone::Color>(_nowTurn),pos);
 	_stones.push_back(newStone);
 	_boards[_yPos][_xPos] = newStone;
+
+	OmokResult result = VictoryDecision(newStone);
+
+	if (result == OmokResult::BLACK_WIN)
+		MessageBox(
+			NULL,
+			L"흑돌 승리!",
+			L"알림",
+			MB_OK | MB_ICONINFORMATION
+		);
+
+	if (result == OmokResult::WHILTE_WIN)
+		MessageBox(
+			NULL,
+			L"백돌 승리!",
+			L"알림",
+			MB_OK | MB_ICONINFORMATION
+		);
 
 	_nowTurn = static_cast<OmokWnd::TURN>((static_cast<int>(_nowTurn) + 1) % 2);
 	InvalidateRect(_hwnd, NULL, TRUE);
@@ -322,17 +340,16 @@ OmokWnd::OmokResult OmokWnd::VictoryDecision(Stone* stone)
 
 	Stone::Color color = stone->GetColor();
 	Vector2Int pos = stone->GetPos();
+	bool omok = false;
 	for (auto& dir : dirVector) 
 	{
-		Vector2Int nowPos = pos;
 		std::vector<Vector2Int> tasks;
 		tasks.push_back(dir);
 		tasks.push_back(dir * -1);
-
 		int cnt = 1;
-
 		for (const auto& task : tasks) 
 		{
+			Vector2Int nowPos = pos;
 			while (true)
 			{
 				Vector2Int nextPos = { nowPos.x + task.x, nowPos.y + task.y };
@@ -350,9 +367,23 @@ OmokWnd::OmokResult OmokWnd::VictoryDecision(Stone* stone)
 				cnt++;
 				nowPos = nextPos;
 			}
+
+			// 5목 이상은 넘김
+			if (cnt == 5) 
+			{
+				omok = true;
+				break;
+			}
 		}
+
+		if (omok) 
+			break;
 	}
 
+	if (omok)
+	{
+		result = static_cast<OmokWnd::OmokResult>(color);
+	}
 	// 역행렬 구하기 ... 
 	return result;
 }
