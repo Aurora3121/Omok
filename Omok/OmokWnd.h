@@ -35,7 +35,7 @@ private:
 	Stone*					_boards[BOARDSIZE][BOARDSIZE];
 	OmokWnd::TURN			_nowTurn;
 	std::vector<HBRUSH>		_brushs;
-
+	bool					_gameEnd;
 public:
 	OmokWnd(
 		HINSTANCE hInstance
@@ -57,6 +57,8 @@ public:
 	void Render(HDC hdc);
 	void DrawCircle(HDC hdc, int centerX, int centerY, int radius);
 	OmokWnd::OmokResult VictoryDecision(Stone* stone);
-	bool ThreeThreeDecision();
+
+private:
+	void ReGame();
 };
 

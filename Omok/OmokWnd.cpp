@@ -12,7 +12,7 @@ OmokWnd::OmokWnd(
 	, LPTSTR lpCmdLine
 	, int nCmdShow
 )
-	: _hInstance(hInstance), _nCmdShow(nCmdShow), _nowTurn(OmokWnd::TURN::BLACK)
+	: _hInstance(hInstance), _nCmdShow(nCmdShow), _nowTurn(OmokWnd::TURN::BLACK), _gameEnd(false)
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -184,6 +184,10 @@ int OmokWnd::GetMsg()
 
 void OmokWnd::HandleMouseClick(int xPos, int yPos)
 {
+	if (_gameEnd)
+		return;
+
+
 	int margin = MARGIN;    // 여백
 	int cellSize = CELLSIZE;  // 각 셀의 크기
 	int boardSize = BOARDSIZE; // 19x19 바둑판
@@ -240,23 +244,45 @@ void OmokWnd::HandleMouseClick(int xPos, int yPos)
 
 	OmokResult result = VictoryDecision(newStone);
 
+	int msgboxID = INT_MIN;
+
 	if (result == OmokResult::BLACK_WIN)
-		MessageBox(
+	{
+		InvalidateRect(_hwnd, NULL, TRUE);
+		msgboxID = MessageBox(
 			NULL,
-			L"흑돌 승리!",
+			L"흑돌 승리!\n게임을 다시 하시겠습니까?",
 			L"알림",
-			MB_OK | MB_ICONINFORMATION
+			MB_ICONQUESTION | MB_YESNO
 		);
+	}
 
 	if (result == OmokResult::WHILTE_WIN)
-		MessageBox(
+	{
+		InvalidateRect(_hwnd, NULL, TRUE);
+		msgboxID = MessageBox(
 			NULL,
-			L"백돌 승리!",
+			L"백돌 승리!\n게임을 다시 하시겠습니까?",
 			L"알림",
-			MB_OK | MB_ICONINFORMATION
+			MB_ICONQUESTION | MB_YESNO
 		);
+	}
 
 	_nowTurn = static_cast<OmokWnd::TURN>((static_cast<int>(_nowTurn) + 1) % 2);
+
+	if (msgboxID != INT_MIN) 
+	{
+		switch (msgboxID)
+		{
+		case IDYES:
+			ReGame();
+			break;
+		case IDNO:
+			_gameEnd = true;
+			break;
+		}
+	}
+
 	InvalidateRect(_hwnd, NULL, TRUE);
 }
 
@@ -388,7 +414,23 @@ OmokWnd::OmokResult OmokWnd::VictoryDecision(Stone* stone)
 	return result;
 }
 
-bool OmokWnd::ThreeThreeDecision()
+void OmokWnd::ReGame()
 {
-	return false;
+	_nowTurn = OmokWnd::TURN::BLACK;
+
+	for (const auto& stone : _stones)
+	{
+		if (stone)
+			delete stone;
+	}
+
+	_stones.clear();
+
+	for (int y = 0; y < BOARDSIZE; y++)
+	{
+		for (int x = 0; x < BOARDSIZE; x++)
+		{
+			_boards[y][x] = nullptr;
+		}
+	}
 }
